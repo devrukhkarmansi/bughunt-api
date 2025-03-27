@@ -1,0 +1,412 @@
+{
+  "pairs": [
+    {
+      "id": "pair_001",
+      "bug": {
+        "id": "bug_001",
+        "title": "Infinite Loop in useEffect",
+        "description": "Component re-renders infinitely due to missing dependency array",
+        "category": "FRONTEND",
+        "difficulty": "medium",
+        "tags": ["react", "hooks", "performance"]
+      },
+      "solution": {
+        "id": "sol_001",
+        "description": "Add missing dependencies to useEffect dependency array",
+        "code": "useEffect(() => {\n  // effect code\n}, [dependency1, dependency2]);",
+        "explanation": "React's useEffect hook requires all external values used inside the effect to be listed in the dependency array"
+      }
+    },
+    {
+      "id": "pair_002",
+      "bug": {
+        "id": "bug_002",
+        "title": "SQL Injection Vulnerability",
+        "description": "Raw SQL query using string concatenation with user input",
+        "category": "SECURITY",
+        "difficulty": "hard",
+        "tags": ["security", "sql", "backend"]
+      },
+      "solution": {
+        "id": "sol_002",
+        "description": "Use parameterized queries or ORM",
+        "code": "const result = await db.query('SELECT * FROM users WHERE id = $1', [userId]);",
+        "explanation": "Parameterized queries prevent SQL injection by properly escaping user input"
+      }
+    },
+    {
+      "id": "pair_003",
+        "bug": {
+        "id": "bug_003",
+        "title": "Memory Leak in Event Listener",
+        "description": "Event listener not removed on component unmount",
+        "category": "FRONTEND",
+        "difficulty": "medium",
+        "tags": ["javascript", "memory", "events"]
+      },
+      "solution": {
+        "id": "sol_003",
+        "description": "Remove event listener in cleanup function",
+        "code": "useEffect(() => {\n  window.addEventListener('resize', handleResize);\n  return () => window.removeEventListener('resize', handleResize);\n}, []);",
+        "explanation": "Always clean up event listeners to prevent memory leaks"
+      }
+    },
+    {
+      "id": "pair_004",
+      "bug": {
+        "id": "bug_004",
+        "title": "Race Condition in API Calls",
+        "description": "Multiple API calls updating same state causing inconsistent data",
+        "category": "BACKEND",
+        "difficulty": "hard",
+        "tags": ["async", "race-condition", "state"]
+      },
+      "solution": {
+        "id": "sol_004",
+        "description": "Use request cancellation or debouncing",
+        "code": "const controller = new AbortController();\nconst signal = controller.signal;\n\nfetch(url, { signal });\ncontroller.abort();",
+        "explanation": "Cancel previous requests or debounce API calls to prevent race conditions"
+      }
+    },
+    {
+      "id": "pair_005",
+      "bug": {
+        "id": "bug_005",
+        "title": "Missing Index on Foreign Key",
+        "description": "Slow queries due to missing index on foreign key column",
+        "category": "DATABASE",
+        "difficulty": "medium",
+        "tags": ["database", "performance", "sql"]
+      },
+      "solution": {
+        "id": "sol_005",
+        "description": "Add index on foreign key column",
+        "code": "CREATE INDEX idx_user_id ON orders(user_id);",
+        "explanation": "Indexes on foreign keys improve join performance"
+      }
+    },
+    {
+      "id": "pair_006",
+      "bug": {
+        "id": "bug_006",
+        "title": "XSS Vulnerability",
+        "description": "Unsanitized user input rendered in HTML",
+        "category": "SECURITY",
+        "difficulty": "medium",
+        "tags": ["security", "xss", "frontend"]
+      },
+      "solution": {
+        "id": "sol_006",
+        "description": "Sanitize user input before rendering",
+        "code": "import DOMPurify from 'dompurify';\nconst safeHtml = DOMPurify.sanitize(userInput);",
+        "explanation": "Sanitize user input to prevent XSS attacks"
+      }
+    },
+    {
+      "id": "pair_007",
+      "bug": {
+        "id": "bug_007",
+        "title": "Missing Error Boundaries",
+        "description": "App crashes due to unhandled component errors",
+        "category": "FRONTEND",
+        "difficulty": "easy",
+        "tags": ["react", "error-handling"]
+      },
+      "solution": {
+        "id": "sol_007",
+        "description": "Implement React Error Boundaries",
+        "code": "class ErrorBoundary extends React.Component {\n  componentDidCatch(error, errorInfo) {\n    // Log error\n  }\n  render() {\n    return this.props.children;\n  }\n}",
+        "explanation": "Error boundaries catch and handle component errors gracefully"
+      }
+    },
+    {
+      "id": "pair_008",
+      "bug": {
+        "id": "bug_008",
+        "title": "N+1 Query Problem",
+        "description": "Multiple database queries in a loop",
+        "category": "DATABASE",
+        "difficulty": "medium",
+        "tags": ["database", "performance", "orm"]
+      },
+      "solution": {
+        "id": "sol_008",
+        "description": "Use eager loading or batch queries",
+        "code": "const users = await User.findAll({\n  include: [{ model: Post }]\n});",
+        "explanation": "Eager loading reduces number of database queries"
+      }
+    },
+    {
+      "id": "pair_009",
+      "bug": {
+        "id": "bug_009",
+        "title": "Missing Input Validation",
+        "description": "Server accepts invalid data without validation",
+        "category": "BACKEND",
+        "difficulty": "easy",
+        "tags": ["validation", "backend"]
+      },
+      "solution": {
+        "id": "sol_009",
+        "description": "Implement input validation middleware",
+        "code": "const schema = Joi.object({\n  email: Joi.string().email().required(),\n  age: Joi.number().min(0).max(120)\n});",
+        "explanation": "Validate all user input before processing"
+      }
+    },
+    {
+      "id": "pair_010",
+      "bug": {
+        "id": "bug_010",
+        "title": "Unoptimized Images",
+        "description": "Large images causing slow page load",
+        "category": "PERFORMANCE",
+        "difficulty": "easy",
+        "tags": ["performance", "images", "frontend"]
+      },
+      "solution": {
+        "id": "sol_010",
+        "description": "Optimize and lazy load images",
+        "code": "<img loading=\"lazy\" src=\"image.jpg\" alt=\"description\">",
+        "explanation": "Lazy loading and image optimization improve page performance"
+      }
+    },
+    {
+      "id": "pair_011",
+      "bug": {
+        "id": "bug_011",
+        "title": "Missing CSRF Protection",
+        "description": "Forms vulnerable to Cross-Site Request Forgery",
+        "category": "SECURITY",
+        "difficulty": "medium",
+        "tags": ["security", "csrf", "backend"]
+      },
+      "solution": {
+        "id": "sol_011",
+        "description": "Implement CSRF tokens",
+        "code": "app.use(csrf({ cookie: true }));\n// In form: <input type=\"hidden\" name=\"_csrf\" value=\"<%= csrfToken %>\">",
+        "explanation": "CSRF tokens prevent unauthorized form submissions"
+      }
+    },
+    {
+      "id": "pair_012",
+      "bug": {
+        "id": "bug_012",
+        "title": "Unhandled Promise Rejection",
+        "description": "Promise errors not caught causing app crashes",
+        "category": "FRONTEND",
+        "difficulty": "medium",
+        "tags": ["javascript", "async", "error-handling"]
+      },
+      "solution": {
+        "id": "sol_012",
+        "description": "Add try-catch or .catch() to promises",
+        "code": "try {\n  await someAsyncOperation();\n} catch (error) {\n  console.error(error);\n}",
+        "explanation": "Always handle promise rejections to prevent app crashes"
+      }
+    },
+    {
+      "id": "pair_013",
+      "bug": {
+        "id": "bug_013",
+        "title": "Missing Database Connection Pool",
+        "description": "Database connections not being reused, causing connection exhaustion",
+        "category": "DATABASE",
+        "difficulty": "hard",
+        "tags": ["database", "connection-pool", "performance"]
+      },
+      "solution": {
+        "id": "sol_013",
+        "description": "Implement connection pooling",
+        "code": "const pool = new Pool({\n  max: 20,\n  idleTimeoutMillis: 30000\n});",
+        "explanation": "Connection pooling reuses database connections to improve performance"
+      }
+    },
+    {
+      "id": "pair_014",
+      "bug": {
+        "id": "bug_014",
+        "title": "Missing Content Security Policy",
+        "description": "No CSP headers allowing potential XSS and other injection attacks",
+        "category": "SECURITY",
+        "difficulty": "medium",
+        "tags": ["security", "csp", "headers"]
+      },
+      "solution": {
+        "id": "sol_014",
+        "description": "Implement Content Security Policy headers",
+        "code": "app.use(helmet({\n  contentSecurityPolicy: {\n    directives: {\n      defaultSrc: [\"'self'\"],\n      scriptSrc: [\"'self'\"],\n      styleSrc: [\"'self'\"],\n    }\n  }\n}));",
+        "explanation": "CSP headers restrict resource loading to prevent various injection attacks"
+      }
+    },
+    {
+      "id": "pair_015",
+      "bug": {
+        "id": "bug_015",
+        "title": "Unoptimized Bundle Size",
+        "description": "Large JavaScript bundle causing slow initial page load",
+        "category": "PERFORMANCE",
+        "difficulty": "medium",
+        "tags": ["performance", "bundling", "webpack"]
+      },
+      "solution": {
+        "id": "sol_015",
+        "description": "Implement code splitting and tree shaking",
+        "code": "const MyComponent = React.lazy(() => import('./MyComponent'));\n// In webpack config:\noptimization: {\n  usedExports: true,\n  minimize: true\n}",
+        "explanation": "Code splitting and tree shaking reduce bundle size by loading only needed code"
+      }
+    },
+    {
+      "id": "pair_016",
+      "bug": {
+        "id": "bug_016",
+        "title": "Missing Rate Limiting",
+        "description": "API endpoints vulnerable to abuse and DoS attacks",
+        "category": "SECURITY",
+        "difficulty": "medium",
+        "tags": ["security", "rate-limit", "api"]
+      },
+      "solution": {
+        "id": "sol_016",
+        "description": "Implement rate limiting middleware",
+        "code": "const rateLimit = require('express-rate-limit');\napp.use(rateLimit({\n  windowMs: 15 * 60 * 1000,\n  max: 100\n}));",
+        "explanation": "Rate limiting prevents abuse by restricting request frequency"
+      }
+    },
+    {
+      "id": "pair_017",
+      "bug": {
+        "id": "bug_017",
+        "title": "Missing Error Logging",
+        "description": "Application errors not being logged or monitored",
+        "category": "BACKEND",
+        "difficulty": "easy",
+        "tags": ["logging", "monitoring", "errors"]
+      },
+      "solution": {
+        "id": "sol_017",
+        "description": "Implement structured error logging",
+        "code": "const winston = require('winston');\nconst logger = winston.createLogger({\n  level: 'error',\n  format: winston.format.json(),\n  transports: [new winston.transports.File({ filename: 'error.log' })]\n});",
+        "explanation": "Structured logging helps track and debug application issues"
+      }
+    },
+    {
+      "id": "pair_018",
+      "bug": {
+        "id": "bug_018",
+        "title": "Missing Input Sanitization",
+        "description": "User input not being sanitized before database storage",
+        "category": "SECURITY",
+        "difficulty": "medium",
+        "tags": ["security", "input", "validation"]
+      },
+      "solution": {
+        "id": "sol_018",
+        "description": "Implement input sanitization",
+        "code": "const sanitize = require('sanitize-html');\nconst cleanInput = sanitize(userInput, {\n  allowedTags: [],\n  allowedAttributes: {}\n});",
+        "explanation": "Input sanitization removes potentially harmful content from user input"
+      }
+    },
+    {
+      "id": "pair_019",
+      "bug": {
+        "id": "bug_019",
+        "title": "Missing Database Migrations",
+        "description": "Database schema changes not version controlled",
+        "category": "DATABASE",
+        "difficulty": "medium",
+        "tags": ["database", "migrations", "version-control"]
+      },
+      "solution": {
+        "id": "sol_019",
+        "description": "Implement database migrations",
+        "code": "exports.up = function(knex) {\n  return knex.schema.createTable('users', table => {\n    table.increments('id');\n    table.string('name');\n  });\n};",
+        "explanation": "Database migrations version control schema changes"
+      }
+    },
+    {
+      "id": "pair_020",
+      "bug": {
+        "id": "bug_020",
+        "title": "Missing API Documentation",
+        "description": "API endpoints not documented causing integration issues",
+        "category": "BACKEND",
+        "difficulty": "easy",
+        "tags": ["api", "documentation", "swagger"]
+      },
+      "solution": {
+        "id": "sol_020",
+        "description": "Implement API documentation using Swagger/OpenAPI",
+        "code": "const swaggerJsdoc = require('swagger-jsdoc');\nconst swaggerUi = require('swagger-ui-express');\n\napp.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsdoc(options)));",
+        "explanation": "API documentation helps developers understand and integrate with the API"
+      }
+    },
+    {
+      "id": "pair_021",
+      "bug": {
+        "id": "bug_021",
+        "title": "Missing Loading States",
+        "description": "UI not showing loading states during async operations",
+        "category": "FRONTEND",
+        "difficulty": "easy",
+        "tags": ["ui", "loading", "ux"]
+      },
+      "solution": {
+        "id": "sol_021",
+        "description": "Implement loading states and skeletons",
+        "code": "const [isLoading, setIsLoading] = useState(false);\nreturn isLoading ? <SkeletonLoader /> : <Content />;",
+        "explanation": "Loading states improve user experience during async operations"
+      }
+    },
+    {
+      "id": "pair_022",
+      "bug": {
+        "id": "bug_022",
+        "title": "Missing Error Recovery",
+        "description": "Application not handling network errors gracefully",
+        "category": "FRONTEND",
+        "difficulty": "medium",
+        "tags": ["error-handling", "network", "recovery"]
+      },
+      "solution": {
+        "id": "sol_022",
+        "description": "Implement error recovery and retry logic",
+        "code": "const fetchWithRetry = async (url, options, retries = 3) => {\n  try {\n    return await fetch(url, options);\n  } catch (error) {\n    if (retries > 0) {\n      await new Promise(resolve => setTimeout(resolve, 1000));\n      return fetchWithRetry(url, options, retries - 1);\n    }\n    throw error;\n  }\n};",
+        "explanation": "Error recovery mechanisms help handle network issues gracefully"
+      }
+    },
+    {
+      "id": "pair_023",
+      "bug": {
+        "id": "bug_023",
+        "title": "Missing Cache Headers",
+        "description": "Static assets not being cached by browsers",
+        "category": "PERFORMANCE",
+        "difficulty": "medium",
+        "tags": ["performance", "caching", "headers"]
+      },
+      "solution": {
+        "id": "sol_023",
+        "description": "Implement proper cache headers",
+        "code": "app.use(express.static('public', {\n  maxAge: '1d',\n  etag: true,\n  lastModified: true\n}));",
+        "explanation": "Cache headers improve performance by allowing browsers to cache static assets"
+      }
+    },
+    {
+      "id": "pair_024",
+      "bug": {
+        "id": "bug_024",
+        "title": "Missing Database Indexes",
+        "description": "Slow queries due to missing indexes on frequently queried columns",
+        "category": "DATABASE",
+        "difficulty": "medium",
+        "tags": ["database", "performance", "indexing"]
+      },
+      "solution": {
+        "id": "sol_024",
+        "description": "Add appropriate indexes",
+        "code": "CREATE INDEX idx_email ON users(email);\nCREATE INDEX idx_created_at ON orders(created_at);",
+        "explanation": "Indexes improve query performance on frequently accessed columns"
+      }
+    }
+  ]
+} 
