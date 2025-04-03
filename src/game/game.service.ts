@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
-import { Card, CardDifficulty } from './entities/card.entity';
+import { AiService } from '../ai/ai.service';
+import { Card, CardDifficulty, CardType } from './entities/card.entity';
 import { GameState, GameConfig, PlayerGameState } from './entities/game.entity';
 
 /**
@@ -10,36 +10,7 @@ import { GameState, GameConfig, PlayerGameState } from './entities/game.entity';
 export class GameService {
   private games: Map<string, GameState> = new Map();
 
-  // Sample card content - In production, this would come from a database
-  private readonly cardContent = {
-    easy: [
-      {
-        bug: 'Null Pointer Exception',
-        solution: 'Check for null before accessing object',
-      },
-      {
-        bug: 'Array Index Out of Bounds',
-        solution: 'Verify array index is within bounds',
-      },
-      {
-        bug: 'Infinite Loop',
-        solution: 'Add proper loop termination condition',
-      },
-    ],
-    medium: [
-      { bug: 'Race Condition', solution: 'Implement proper synchronization' },
-      { bug: 'Memory Leak', solution: 'Release resources in finally block' },
-      { bug: 'SQL Injection', solution: 'Use parameterized queries' },
-    ],
-    hard: [
-      { bug: 'Deadlock', solution: 'Implement proper lock ordering' },
-      {
-        bug: 'Buffer Overflow',
-        solution: 'Validate buffer size before writing',
-      },
-      { bug: 'Cross-Site Scripting', solution: 'Sanitize user input' },
-    ],
-  };
+  constructor(private readonly aiService: AiService) {}
 
   /**
    * Creates a new game state
@@ -48,43 +19,46 @@ export class GameService {
    * @param config - Game configuration
    * @returns The created game state
    */
-  createGame(
+  async createGame(
     roomCode: string,
     players: { id: string; nickname: string }[],
     config: GameConfig,
-  ): GameState {
-    const gameId = uuidv4();
-    const cards = this.generateCards(config);
+  ): Promise<GameState> {
+    // Generate bug-solution pairs using AI
+    const pairs = await this.aiService.generateBugSolutionPairs(
+      config.numberOfPairs,
+    );
 
-    // Create initial player states
-    const playerStates: Record<string, PlayerGameState> = {};
-    players.forEach((player) => {
-      playerStates[player.id] = {
-        id: player.id,
-        nickname: player.nickname,
-        score: 0,
-        matchesFound: 0,
-        isCurrentTurn: false,
-      };
-    });
-
-    // First player starts
-    playerStates[players[0].id].isCurrentTurn = true;
+    // Create cards from the pairs
+    const cards = this.generateCards(pairs);
 
     const gameState: GameState = {
-      gameId,
+      gameId: Math.random().toString(36).substring(7),
       status: 'playing',
       roomCode,
       cards,
-      players: playerStates,
+      players: players.reduce(
+        (acc, player) => {
+          acc[player.id] = {
+            id: player.id,
+            nickname: player.nickname,
+            score: 0,
+            matchesFound: 0,
+          };
+          return acc;
+        },
+        {} as Record<string, any>,
+      ),
       currentTurn: players[0].id,
       turnNumber: 1,
+      firstFlippedCard: null,
+      secondFlippedCard: null,
       startedAt: Date.now(),
       turnTimeLimit: config.turnTimeLimit,
       currentTurnStartedAt: Date.now(),
     };
 
-    this.games.set(gameId, gameState);
+    this.games.set(gameState.gameId, gameState);
     return gameState;
   }
 
@@ -186,6 +160,7 @@ export class GameService {
    * Switches turns between players
    */
   private switchTurns(game: GameState): void {
+    console.log('Switching turns');
     const playerIds = Object.keys(game.players);
     const currentIndex = playerIds.indexOf(game.currentTurn);
     const nextIndex = (currentIndex + 1) % playerIds.length;
@@ -222,51 +197,47 @@ export class GameService {
   }
 
   /**
-   * Generates cards for a new game
-   * @param config - Game configuration
-   * @returns Array of generated cards
+   * Generates cards from bug-solution pairs
    */
-  private generateCards(config: GameConfig): Card[] {
+  private generateCards(
+    pairs: Array<{
+      bug: string;
+      solution: string;
+      difficulty: 'easy' | 'medium' | 'hard';
+    }>,
+  ): Card[] {
     const cards: Card[] = [];
     let position = 0;
 
-    // Generate card pairs based on difficulty distribution
-    Object.entries(config.difficultyDistribution).forEach(
-      ([difficulty, count]) => {
-        const content = this.cardContent[difficulty as CardDifficulty];
-        for (let i = 0; i < count; i++) {
-          const pair = content[i % content.length];
-          const bugId = uuidv4();
-          const solutionId = uuidv4();
+    pairs.forEach((pair) => {
+      const bugId = `card_${position}`;
+      const solutionId = `card_${position + 1}`;
 
-          // Create bug card
-          cards.push({
-            id: bugId,
-            type: 'bug',
-            content: pair.bug,
-            difficulty: difficulty as CardDifficulty,
-            isFlipped: false,
-            isMatched: false,
-            matchingCardId: solutionId,
-            position: position++,
-          });
+      // Create bug card
+      cards.push({
+        id: bugId,
+        type: 'bug' as CardType,
+        content: pair.bug,
+        difficulty: pair.difficulty,
+        isFlipped: false,
+        isMatched: false,
+        matchingCardId: solutionId,
+        position: position++,
+      });
 
-          // Create solution card
-          cards.push({
-            id: solutionId,
-            type: 'solution',
-            content: pair.solution,
-            difficulty: difficulty as CardDifficulty,
-            isFlipped: false,
-            isMatched: false,
-            matchingCardId: bugId,
-            position: position++,
-          });
-        }
-      },
-    );
+      // Create solution card
+      cards.push({
+        id: solutionId,
+        type: 'solution' as CardType,
+        content: pair.solution,
+        difficulty: pair.difficulty,
+        isFlipped: false,
+        isMatched: false,
+        matchingCardId: bugId,
+        position: position++,
+      });
+    });
 
-    // Shuffle the cards
     return this.shuffleCards(cards);
   }
 
@@ -299,5 +270,52 @@ export class GameService {
       shuffled[j].position = j;
     }
     return shuffled;
+  }
+
+  /**
+   * Handles timer expiration for a player's turn
+   */
+  handleTimerExpiration(
+    gameId: string,
+    playerId: string,
+  ): {
+    gameState: GameState;
+    action: 'timeUp';
+  } | null {
+    console.log('Handling timer expiration');
+    console.log('Game ID:', this.games);
+    const game = this.games.get(gameId);
+    if (!game) {
+      console.log('Game not found');
+      return null;
+    }
+
+    // Validate it's the player's turn
+    if (game.currentTurn !== playerId) {
+      console.log("Not the player's turn");
+      return null;
+    }
+    console.log('It is the player turn');
+
+    // If there's a flipped card, flip it back
+    if (game.firstFlippedCard) {
+      console.log('There is a flipped card');
+      const firstCard = game.cards.find((c) => c.id === game.firstFlippedCard);
+      if (firstCard) {
+        console.log('Flipping back the card');
+        firstCard.isFlipped = false;
+      }
+      game.firstFlippedCard = null;
+    }
+
+    // Switch turns
+    this.switchTurns(game);
+
+    console.log('Game state updated :', game);
+
+    return {
+      gameState: game,
+      action: 'timeUp',
+    };
   }
 }

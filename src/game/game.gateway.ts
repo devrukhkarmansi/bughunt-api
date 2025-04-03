@@ -202,4 +202,36 @@ export class GameGateway {
     // This could involve ending the game early and declaring the other player as winner
     console.log('Forfeit:', payload);
   }
+
+  @SubscribeMessage('game:turnTimeout')
+  async handleTimerExpiration(
+    @MessageBody()
+    payload: {
+      event: string;
+      data: { gameId: string; playerId: string };
+    },
+  ) {
+    console.log('Timer expiration:', payload);
+    const result = this.gameService.handleTimerExpiration(
+      payload.data.gameId,
+      payload.data.playerId,
+    );
+
+    console.log('Result:', result);
+    if (result) {
+      // Broadcast the updated game state to all players in the room
+      this.server.to(result.gameState.roomCode).emit('game:turnChanged', {
+        event: 'game:turnChanged',
+        data: {
+          gameState: result.gameState,
+          currentPlayer: {
+            id: result.gameState.currentTurn,
+            nickname:
+              result.gameState.players[result.gameState.currentTurn].nickname,
+          },
+          message: `${result.gameState.players[result.gameState.currentTurn].nickname}'s turn`,
+        },
+      });
+    }
+  }
 }

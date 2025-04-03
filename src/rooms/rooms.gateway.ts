@@ -241,7 +241,7 @@ export class RoomsGateway {
    * Handles game start event from the host
    */
   @SubscribeMessage('room:startGame')
-  handleGameStart(
+  async handleGameStart(
     @ConnectedSocket() client: Socket,
     @MessageBody()
     payload: {
@@ -250,7 +250,7 @@ export class RoomsGateway {
         roomCode: string;
       };
     },
-  ): void {
+  ): Promise<void> {
     console.log('Starting game:', payload);
 
     const room = this.roomsService.getRoom(payload.data.roomCode);
@@ -283,25 +283,35 @@ export class RoomsGateway {
       return;
     }
 
-    // Initialize game
-    const gameState = this.gameService.createGame(
-      payload.data.roomCode,
-      players,
-      {
-        numberOfPairs: 6, // 12 cards total
-        turnTimeLimit: 30,
-        difficultyDistribution: {
-          easy: 2,
-          medium: 2,
-          hard: 2,
+    try {
+      // Initialize game
+      const gameState = await this.gameService.createGame(
+        payload.data.roomCode,
+        players,
+        {
+          numberOfPairs: 6, // 12 cards total
+          turnTimeLimit: 30,
+          difficultyDistribution: {
+            easy: 2,
+            medium: 2,
+            hard: 2,
+          },
         },
-      },
-    );
+      );
 
-    // Emit game started event to all players in room
-    this.server.to(payload.data.roomCode).emit('game:started', {
-      event: 'game:started',
-      data: gameState,
-    });
+      // Emit game started event to all players in room
+      this.server.to(payload.data.roomCode).emit('game:started', {
+        event: 'game:started',
+        data: gameState,
+      });
+    } catch (error) {
+      console.error('Error starting game:', error);
+      client.emit('game:error', {
+        event: 'game:error',
+        data: {
+          message: 'Failed to start the game',
+        },
+      });
+    }
   }
 }
